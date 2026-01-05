@@ -1,4 +1,4 @@
-# Crypto Candlestick Image Classification Research
+# Time Series as Candlesticks
 
 ## Overview
 
