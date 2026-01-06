@@ -2,10 +2,6 @@
 
 ## Overview
 
-This project explores the use of Convolutional Neural Networks (CNNs) to predict short-term price movement direction in cryptocurrencies by treating sequences of 1-minute candlestick charts as images.
-
-The core idea is to convert historical OHLC (Open, High, Low, Close) data from Binance into small candlestick chart images using `mplfinance`, then train a simple CNN to classify whether the price will end **higher** or **lower** than the starting point of the observed window (or, in one variant, whether the last candle is bullish or bearish).
-
 Three distinct labeling strategies are implemented in separate scripts:
 
 1. **`full_image.py`** – "Full-window" labeling  
