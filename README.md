@@ -1,69 +1,115 @@
-# Time Series as Candlesticks
+```markdown
+# Candlestick Is All You Need: Vision Time Series
 
-## Overview
+**Repository for the paper submission to ACM SIGKDD (KDD) 2026**  
 
-Three distinct labeling strategies are implemented in separate scripts:
+This repository contains the code, architecture definitions, and experiment scripts for the paper:
 
-1. **`full_image.py`** – "Full-window" labeling  
-   Label = UP if the **last close** > **first open** of the entire window (measures overall price change over the window).
+> **"Candlestick Is All You Need: Exploring Pre-trained Vision Models and Lightweight CNNs for Cryptocurrency Price Direction Prediction from Minute-level OHLCV Images"**
 
-2. **`lastcandle_image.py`** – "Last-candle" labeling  
-   Label = UP if the **last candle** is green (close > open). A simpler, more traditional single-candle direction prediction.
+The work investigates whether modern **pre-trained computer vision backbones** (MobileNetV3, EdgeNeXt, GhostNet, EfficientNet-B0, LeViT) and a very **lightweight custom CNN** can effectively predict the directional movement (UP/DOWN) of major cryptocurrencies using **only candlestick chart images** generated from 1-minute OHLC data, without any additional numerical features or time-series specific architectures.
 
-3. **`irregular_image.py`** – Irregular/sparse data experiment  
-   Simulates missing minute data (60%, 80%, 95% randomly removed) while keeping fixed time windows, testing robustness to incomplete time series.
+## Key Contributions
 
-All experiments use the same CNN architecture, training regime, and evaluation metrics across multiple coins, window sizes, and time periods.
+- Systematic comparison of **5 strong pre-trained vision models** vs. a tiny custom CNN (~few hundred thousand parameters) on the **same image classification task**
+- Three complementary experimental settings:
+  - **Exp A** — Full-window labeling (last close > first open) + memory-efficient training
+  - **Exp B** — Standard last-candle labeling (realistic trading signal)
+  - **Exp C** — Irregular / missing data robustness (60%, 80%, 95% random omission)
+- Multi-month **out-of-sample testing** on volatile periods across **BTC, ETH, BNB, XRP, ADA, DOGE**
+- Train on short windows (1 week) and test on longer horizons (2–4 weeks) — **temporal generalization** study
+- Extremely low memory footprint training pipelines (lazy loading + TF Dataset / PyTorch DataLoader)
 
-## Project Structure
+## Repository Structure
 
+```text
+thequantscientist-candlestick-is-all-you-need/
+├── requirements.txt               # Core dependencies (minimal & optional torch/timm)
+└── src/
+    ├── architecture/
+    │   └── small_cnn.py           # Lightweight custom CNN (used in Exp A/B/C Small-CNN variant)
+    └── imaging/
+        ├── Pre-trained/           # Experiments using timm & TF pre-trained models
+        │   ├── Experiment_A.py    # Full-window labeling + reuse regular images
+        │   ├── Experiment_B.py    # Standard last-candle labeling
+        │   └── Experiment_C.py    # Irregular / missing data (60–95%)
+        └── Small-CNN/             # Same three experiments — but using custom tiny CNN
+            ├── Experiment_A.py
+            ├── Experiment_B.py
+            └── Experiment_C.py
 ```
-crypto_research_minute/                  # Baseline (last-candle & full-window)
-crypto_research_minute_fullimage/        # Full-window labeling results
-crypto_research_minute_irregular/        # Irregular missing data results
-full_image.py
-lastcandle_image.py
-irregular_image.py
-README.md
-```
 
-Each output directory contains per-coin subfolders with:
-- `raw_data/` – Downloaded 1-minute OHLC CSVs
-- `images/`   – Generated 64×64 px candlestick images (DPI=32)
-- `models/`   – Saved Keras `.h5` model files
-- `results/`  – Text files with accuracy, F1, recall, AUROC, AUPRC
+## Experimental Settings Summary
 
-## Key Design Choices
+| Experiment | Labeling Rule                        | Data Completeness | Model Family          | Purpose                              |
+|------------|--------------------------------------|-------------------|-----------------------|--------------------------------------|
+| **A**      | Full window (last close > first open) | 100%              | Pre-trained + Small CNN | Strongest possible signal             |
+| **B**      | Last candle (close > open)           | 100%              | Pre-trained + Small CNN | Realistic trading-label baseline     |
+| **C**      | Last candle                          | 5–40% kept        | Pre-trained + Small CNN | Robustness to missing / irregular data |
 
-- **Coins**: BTCUSDT, ETHUSDT, BNBUSDT, XRPUSDT, ADAUSDT, DOGEUSDT
-- **Time periods**: 7, 14, 21, 28 days (1–4 weeks)
-- **Image window sizes**: 5, 15, 30 consecutive minutes rendered in each image
-- **Image size**: 64×64 pixels (resized after generation)
-- **CNN**: Lightweight 3-conv-layer model with dropout and class weighting
-- **Training**: 10 epochs, binary cross-entropy, balanced class weights
-- **Labeling variations**: As described above
-- **Experiments**:
-  - **Experiment I**: Train and test on matching period lengths (7→7, 14→14, etc.)
-  - **Experiment II**: Train on 1-week data, test on 2-, 3-, 4-week periods (generalization test)
+All experiments test:
+
+- Multiple **window sizes** (5, 15, 30 candles)
+- Multiple **training periods** (1 week → test on 1–4 weeks)
+- **6 major coins** with different market regimes
 
 ## Requirements
 
-```bash
-pip install requests pandas mplfinance matplotlib numpy pillow tensorflow scikit-learn
+```text
+# Core
+pandas numpy requests tqdm Pillow matplotlib mplfinance
+
+# ML
+scikit-learn
+
+# TensorFlow (EfficientNet + custom CNN)
+tensorflow>=2.10
+
+# Optional — for timm models (MobileNetV3, EdgeNeXt, GhostNet, LeViT)
+torch torchvision timm
 ```
 
-Tested with:
-- Python 3.9+
-- TensorFlow 2.x
-- matplotlib 3.5+
+Install:
+
+```bash
+pip install -r requirements.txt
+# If using GPU + timm models → install matching torch+cuda version manually
+```
 
 ## Usage
 
-Each script can be run independently:
+Each experiment script supports the same powerful argument interface:
 
 ```bash
-python lastcandle_image.py      # Baseline: predict last candle direction
-python full_image.py            # Full-window price change prediction
-python irregular_image.py       # Sparse/irregular data experiments
+# Example: run full pre-trained pipeline for BTC, MobileNetV3, 5-candle windows, only 7-day periods
+python src/imaging/Pre-trained/Experiment_B.py --model mobilenetv3 --coin BTCUSDT --window 5 --time-length 7
+
+# Run only Experiment II (1-week train → longer test) with small CNN
+python src/imaging/Small-CNN/Experiment_A.py --exp2-only
+
+# Run irregular data experiment with 80% missing data
+python src/imaging/Pre-trained/Experiment_C.py --model edgenext --missing 0.8
+
+# See all options
+python src/imaging/Pre-trained/Experiment_B.py --help
 ```
-The scripts include checks to avoid re-downloading data, regenerating images, or retraining models if files already exist. They will resume or skip completed parts automatically.
+
+**Important:** Scripts are **idempotent** — they skip already computed raw data, images, models, and result files.
+
+## Reproducibility Notes
+
+- All models are either **fully pre-trained** (ImageNet) or **very small** → training is fast even on modest hardware
+- Lazy loading prevents RAM explosion (tested with <1 GB peak usage per job)
+- Results are deterministically saved in per-coin subfolders: `results/`, `models/`
+- Raw OHLCV data is fetched from **Binance public API** (no private keys needed)
+
+
+```
+
+## Acknowledgments
+
+Built with:
+
+- [mplfinance](https://github.com/matplotlib/mplfinance) — beautiful candlestick rendering
+- [timm](https://github.com/huggingface/pytorch-image-models) — excellent pre-trained vision backbones
+- Binance public API for 1-minute OHLCV data
