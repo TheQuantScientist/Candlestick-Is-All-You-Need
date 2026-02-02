@@ -100,13 +100,10 @@ python src/imaging/Pre-trained/Experiment_B.py --help
 - Results are deterministically saved in per-coin subfolders: `results/`, `models/`
 - Raw OHLCV data is fetched from **Binance public API** (no private keys needed)
 
-
-```
-
 ## Acknowledgments
 
 Built with:
 
-- [mplfinance](https://github.com/matplotlib/mplfinance) — beautiful candlestick rendering
-- [timm](https://github.com/huggingface/pytorch-image-models) — excellent pre-trained vision backbones
-- Binance public API for 1-minute OHLCV data
+- [mplfinance](https://github.com/matplotlib/mplfinance) — beautiful candlestick rendering  
+- [timm](https://github.com/huggingface/pytorch-image-models) — excellent pre-trained vision backbones  
+- Binance Public API — 1-minute OHLCV data
