@@ -1,11 +1,6 @@
-```markdown
 # Candlestick Is All You Need: Vision Time Series
 
 **Repository for the paper submission to ACM SIGKDD (KDD) 2026**  
-
-This repository contains the code, architecture definitions, and experiment scripts for the paper:
-
-> **"Candlestick Is All You Need: Exploring Pre-trained Vision Models and Lightweight CNNs for Cryptocurrency Price Direction Prediction from Minute-level OHLCV Images"**
 
 The work investigates whether modern **pre-trained computer vision backbones** (MobileNetV3, EdgeNeXt, GhostNet, EfficientNet-B0, LeViT) and a very **lightweight custom CNN** can effectively predict the directional movement (UP/DOWN) of major cryptocurrencies using **only candlestick chart images** generated from 1-minute OHLC data, without any additional numerical features or time-series specific architectures.
 
@@ -22,7 +17,7 @@ The work investigates whether modern **pre-trained computer vision backbones** (
 
 ## Repository Structure
 
-```text
+```markdown
 thequantscientist-candlestick-is-all-you-need/
 ├── requirements.txt               # Core dependencies (minimal & optional torch/timm)
 └── src/
