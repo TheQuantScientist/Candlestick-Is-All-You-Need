@@ -1,8 +1,7 @@
 # Candlestick Is All You Need
 
-<!-- ![Your Banner](results/graphs/banner.png/) -->
 
-![High-level Design Image](results/graphs/design.png/)
+![High-levelDesignImage](results/graphs/design.png/)
 
 The work investigates whether modern **pre-trained computer vision backbones** (MobileNetV3, EdgeNeXt, GhostNet, EfficientNet-B0, LeViT) and a very **lightweight custom CNN** can effectively predict the directional movement (Bullish/Bearish) of major cryptocurrencies using **only candlestick chart images** generated from 1-minute OHLC data, without any additional numerical features or time-series specific architectures.
 
