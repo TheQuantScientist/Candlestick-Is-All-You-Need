@@ -1,0 +1,32 @@
+# ------------------------
+# Core utilities
+# ------------------------
+requests
+pandas
+numpy
+tqdm
+Pillow
+matplotlib
+mplfinance
+
+# ------------------------
+# Machine Learning & Metrics
+# ------------------------
+scikit-learn
+
+# ------------------------
+# TensorFlow (GPU or CPU)
+# ------------------------
+tensorflow>=2.10
+
+# ------------------------
+# PyTorch stack (optional, for timm models)
+# Install matching CUDA version manually if using GPU
+# ------------------------
+torch
+torchvision
+
+# ------------------------
+# timm models (optional)
+# ------------------------
+timm
